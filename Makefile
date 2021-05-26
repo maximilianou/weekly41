@@ -1,17 +1,3 @@
-# weekly41
-Makefile, kubernetes, cluster, docker, 2021.05
-
-- Rethinking some tools: 
-
-- [ ] Docker - container
-- [ ] Kubernetes - nodes, services
-- [ ] OpenFaas - Funciton as a Service - time limitless 
-- [ ] K3d - cluster
-- [ ] TSL - cert-manager 
-- [ ] Arkade - package manager ( with helm )
-
-- Makefile
-```
 include .env
 #user=..
 #servers=..
@@ -40,7 +26,7 @@ step04 generate-types:
 step05 api-test:
 	curl -X POST http://localhost:4000/graphql -H "Content-Type: application/json" -d '{ "query":"query { article(  id: 1 ){ id, title, content } }"}'
 
-step90:
+step90 :
 	kubectl delete all --all # delete all resources in all namespaces
 
 #ssh-manual-root-update:
@@ -74,54 +60,11 @@ step25 ssh-kubectl-install:
 step26 ssh-kubectl-test:
 	$(foreach server, $(servers),  ssh $(user)@$(server) "kubectl version";)
 
-```
-
-
----
-- Makefile ui create
-```
 step30 ui-create:
 	mkdir ui; cd ui; npm init -y; mkdir public; mkdir src; touch public/index.html; \
-	npm i -D typescript webpack webpack-cli http-server; \
+	npm i -D typescript webpack webpack-cli http-server react react-dom @types/react @types/react-dom; \
 	npx tsc --init ;\
 	echo 'UI - Created - React Typescript';
-```
-- ui/tsconfig.json - change just this attributes
-```
-    "jsx"                              : "react"    ,
-    "outDir"                           : "./out"    ,
-    "rootDir"                          : "./src"    ,
-```
+	
 
-- ui/webpack.config.js
-```js
-module.export = {
-  entry: './out/App.js',
-  output: {
-    path: `${__dirname}/public/js`,
-    filename: 'app.js'
-  },
-  externals: {
-    'react': 'React',
-    'react-dom': 'ReactDOM'
-  }
-};
-```
----
-- index.html
-```html
-<!doctype html> 
-<html> 
-  <head> 
-    <meta charset='UTF-8' />
-    <meta name='viewport' content='width=device-width, initial-scale=1, shrink-to-fit=no' />
-    <title>React</title> 
-  </head> 
-  <body> 
-    <div id='root'></div>
-    <noscript>Please enable Javascript in order to view this site.</noscript>
-    <script src='../dist/bundle.js'></script>
-  </body> 
-</html>
-```
 

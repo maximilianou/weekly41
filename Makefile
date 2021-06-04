@@ -34,6 +34,8 @@ step90 :
 #	adduser dev-user; 
 # usermod -g ssh dev-user; 
 #	usermod -g staff dev-user;
+# chown root:staff /usr/local/bin; chmod 775 /usr/local/bin;
+# hostname [dev.domain];
 
 step10 ssh-docker-install:
 	$(foreach server, $(servers),  ssh root@$(server)	" apt -y install apt-transport-https software-properties-common ca-certificates curl gnupg lsb-release; echo  'deb [arch=amd64] https://download.docker.com/linux/debian  buster stable' | tee /etc/apt/sources.list.d/docker.list > /dev/null ;  curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add - ; add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian buster stable" ; apt -y update; apt -y remove docker docker-engine docker.io containerd runc; apt -y install docker-ce docker-ce-cli containerd.io; usermod -aG docker $(user) " \ ;)
@@ -47,18 +49,18 @@ step21 ssh-ls:
 step22 ssh-docker-test:
 	$(foreach server, $(servers),  ssh $(user)@$(server) "docker run hello-world";)
 
-step23 ssh-k3d-install:
-	$(foreach server, $(servers),  ssh root@$(server) "curl -s https://raw.githubusercontent.com/rancher/k3d/main/install.sh | bash";)
+#step23 ssh-k3d-install:
+#	$(foreach server, $(servers),  ssh root@$(server) "curl -s https://raw.githubusercontent.com/rancher/k3d/main/install.sh | bash";)
 	
-step24 ssh-k3d-test:
-	$(foreach server, $(servers),  ssh $(user)@$(server) "k3d --help;";)
+#step24 ssh-k3d-test:
+#	$(foreach server, $(servers),  ssh $(user)@$(server) "k3d --help;";)
 
-kubectl-version!=curl -L -s https://dl.k8s.io/release/stable.txt
-step25 ssh-kubectl-install:
-	$(foreach server, $(servers),  ssh root@$(server) "curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg; curl -LO 'https://dl.k8s.io/release/$(kubectl-version)/bin/linux/amd64/kubectl'; install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl;";)
+#kubectl-version!=curl -L -s https://dl.k8s.io/release/stable.txt
+#step25 ssh-kubectl-install:
+#	$(foreach server, $(servers),  ssh root@$(server) "curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg; curl -LO 'https://dl.k8s.io/release/$(kubectl-version)/bin/linux/amd64/kubectl'; install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl;";)
 
-step26 ssh-kubectl-test:
-	$(foreach server, $(servers),  ssh $(user)@$(server) "kubectl version";)
+#step26 ssh-kubectl-test:
+#	$(foreach server, $(servers),  ssh $(user)@$(server) "kubectl version";)
 
 step30 ui-create:
 	mkdir ui; cd ui; npm init -y; mkdir public; mkdir src; touch public/index.html; \
@@ -67,4 +69,44 @@ step30 ui-create:
 	echo 'UI - Created - React Typescript';
 	
 
+step100 ssh-arkade:
+	$(foreach server, $(servers),  ssh $(user)@$(server) "curl -sLS https://dl.get-arkade.dev | sh";)
+
+step101 ssh-ark-kubectl:
+	$(foreach server, $(servers),  ssh $(user)@$(server) "ark get kubectl; mv ./.arkade/bin/kubectl /usr/local/bin/;";)
+
+step102 ssh-kubectl-test:
+	$(foreach server, $(servers),  ssh $(user)@$(server) "kubectl version";)
+
+step103 ssh-ark-k3d:
+	$(foreach server, $(servers),  ssh $(user)@$(server) "ark get k3d; mv ./.arkade/bin/k3d /usr/local/bin/;";)
+
+step104 ssh-k3d-test:
+	$(foreach server, $(servers),  ssh $(user)@$(server) "k3d version";)
+
+
+## Default usage k3d - kubernetes cluster fast, simple, minimal
+k3d-cluster-create:
+	k3d cluster create
+kubectl-cluster-info:
+	kubectl cluster-info
+k3d-cluster-delete
+	k3d cluster delete
+kubectl-get-nodes:
+	kubectl get nodes
+kubectl-get-sc:
+	kubectl get sc
+kubectl-top-nodes:
+	kubectl top nodes
+kubectl-kube-system-top-nodes:
+	kubectl -n kube-system top nodes
+kubectl-get-componentstatus:
+	kubectl get componentstatus
+
+
+kubectl-run-busybox:
+	kubectl run -it --rm shell1 --image busybox
+
+kubectl-watch-get-pods:
+	watch kubectl get pods -o wide
 

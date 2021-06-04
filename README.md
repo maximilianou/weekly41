@@ -74,6 +74,57 @@ step25 ssh-kubectl-install:
 step26 ssh-kubectl-test:
 	$(foreach server, $(servers),  ssh $(user)@$(server) "kubectl version";)
 
+
+step30 ui-create:
+	mkdir ui; cd ui; npm init -y; mkdir public; mkdir src; touch public/index.html; \
+	npm i -D typescript webpack webpack-cli http-server react react-dom @types/react @types/react-dom; \
+	npx tsc --init ;\
+	echo 'UI - Created - React Typescript';
+	
+
+step100 ssh-arkade:
+	$(foreach server, $(servers),  ssh $(user)@$(server) "curl -sLS https://dl.get-arkade.dev | sh";)
+
+step101 ssh-ark-kubectl:
+	$(foreach server, $(servers),  ssh $(user)@$(server) "ark get kubectl; mv ./.arkade/bin/kubectl /usr/local/bin/;";)
+
+step102 ssh-kubectl-test:
+	$(foreach server, $(servers),  ssh $(user)@$(server) "kubectl version";)
+
+step103 ssh-ark-k3d:
+	$(foreach server, $(servers),  ssh $(user)@$(server) "ark get k3d; mv ./.arkade/bin/k3d /usr/local/bin/;";)
+
+step104 ssh-k3d-test:
+	$(foreach server, $(servers),  ssh $(user)@$(server) "k3d version";)
+
+
+## Default usage k3d - kubernetes cluster fast, simple, minimal
+k3d-cluster-create:
+	k3d cluster create
+kubectl-cluster-info:
+	kubectl cluster-info
+k3d-cluster-delete
+	k3d cluster delete
+kubectl-get-nodes:
+	kubectl get nodes
+kubectl-get-sc:
+	kubectl get sc
+kubectl-top-nodes:
+	kubectl top nodes
+kubectl-kube-system-top-nodes:
+	kubectl -n kube-system top nodes
+kubectl-get-componentstatus:
+	kubectl get componentstatus
+
+
+kubectl-run-busybox:
+	kubectl run -it --rm shell1 --image busybox
+
+kubectl-watch-get-pods:
+	watch kubectl get pods -o wide
+
+
+
 ```
 
 
